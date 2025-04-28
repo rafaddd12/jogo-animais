@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo do Bicho</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- TELAS -->
+
+<!-- TELA APOSTAR -->
+<div id="tela-apostar" class="tela">
+  <h1>Escolha seu Animal 🎯</h1>
+  <div id="animal-selecionado" class="selecionado-texto">Nenhum animal selecionado</div>
+
+  <div class="animais-grid">
+    {% set nomes = [
+      'Avestruz', 'Águia', 'Burro', 'Borboleta', 'Cachorro',
+      'Cabra', 'Carneiro', 'Camelo', 'Cobra', 'Coelho',
+      'Cavalo', 'Elefante', 'Galo', 'Gato', 'Jacaré',
+      'Leão', 'Macaco', 'Porco', 'Pavão', 'Peru',
+      'Touro', 'Tigre', 'Urso', 'Veado', 'Vaca'
+    ] %}
+    {% for numero in range(1, 26) %}
+    <button class="animal-btn" data-numero="{{ numero }}" onclick='selecionarAnimal({{ numero }}, "{{ nomes[numero-1] }}", this)'>
+      <img src="/static/icons/{{ numero }}.jpg" alt="Bicho {{ numero }}" class="animal-img">
+      <div class="animal-numero">{{ numero }}</div>
+      <div class="animal-nome">{{ nomes[numero-1] }}</div>
+    </button>
+    {% endfor %}
+  </div>
+
+  <div class="area-aposta">
+    <input type="number" id="valor" class="input-aposta" placeholder="Valor da aposta" min="1">
+    <button class="botao-apostar" onclick="confirmarAposta()">🎲 Apostar</button>
+  </div>
+
+  <div id="area-resultado" class="resultado-container" style="display: none;">
+    <h2 id="mensagem-resultado"></h2>
+    <div class="animal-sorteado">
+      <img id="imagem-resultado" src="" alt="Animal Sorteado" class="resultado-img">
+      <h3 id="nome-resultado"></h3>
+    </div>
+    <button class="botao-apostar" onclick="limparResultado()">🔄 Nova Aposta</button>
+  </div>
+</div>
+
+<!-- TELA BANCA -->
+<div id="tela-banca" class="tela" style="display:none;">
+  <h1>💰 Banca</h1>
+  <p>Lucro Total: <span id="lucro-total">R$ 0.00</span></p>
+</div>
+
+<!-- TELA RESULTADOS -->
+<div id="tela-resultados" class="tela" style="display:none;">
+  <h1>📝 Últimos Resultados</h1>
+  <div class="lista-resultados">
+    <ul id="lista-resultados"></ul>
+  </div>
+</div>
+
+<!-- TELA CONFIGURAÇÕES -->
+<div id="tela-configuracoes" class="tela" style="display:none;">
+  <h1>⚙️ Configurações</h1>
+  <label>Chance de Vitória (%):</label>
+  <input type="range" id="chance-vitoria" min="0" max="100" value="20">
+  <p><button onclick="zerarBanca()">🔄 Zerar Banca</button></p>
+</div>
+
+<!-- RODAPÉ ABAS -->
+<div class="abas">
+  <button onclick="mostrarTela('apostar')">🎯 Apostar</button>
+  <button onclick="mostrarTela('banca')">💰 Banca</button>
+  <button onclick="mostrarTela('resultados')">📝 Resultados</button>
+  <button onclick="mostrarTela('configuracoes')">⚙️ Configurações</button>
+</div>
+
+<script src="/static/js/main.js" defer></script>
+
+</body>
+</html>
+
