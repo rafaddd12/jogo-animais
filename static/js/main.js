@@ -27,8 +27,13 @@ function selecionarAnimal(numero, nome, elemento) {
 function confirmarAposta() {
     valorAposta = parseFloat(document.getElementById('valor').value);
 
-    if (!animalSelecionado || valorAposta <= 0 || isNaN(valorAposta)) {
-        alert('Escolha um animal e insira um valor válido!');
+    if (!animalSelecionado) {
+        alert('Escolha um animal para apostar!');
+        return;
+    }
+
+    if (isNaN(valorAposta) || valorAposta < 5) {
+        alert('O valor mínimo da aposta é R$ 5,00!');
         return;
     }
 
@@ -49,13 +54,23 @@ async function realizarSorteio() {
         },
         body: `animal=${animalSelecionado}&valor=${valorAposta}`
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.erro || 'Erro ao realizar a aposta');
+            });
+        }
+        return response.json();
+    })
     .then(data => {
         // Mostrar resultado
         document.getElementById('mensagem-resultado').innerText = data.resultado;
         document.getElementById('imagem-resultado').src = `/static/icons/${data.numero}.jpg`;
         document.getElementById('nome-resultado').innerText = `${data.numero} - ${data.animal}`;
         document.getElementById('area-resultado').style.display = 'block';
+    })
+    .catch(error => {
+        alert(error.message);
     });
 }
 

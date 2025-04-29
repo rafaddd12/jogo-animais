@@ -9,6 +9,8 @@ app.secret_key = os.urandom(24)  # Chave para sessão
 # Configurações do admin
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"  # Mude para uma senha mais segura!
+VALOR_MINIMO_APOSTA = 5.0  # Valor mínimo da aposta
+REDUCAO_CHANCE_POR_5_REAIS = 1  # Redução de chance a cada R$ 5,00 acima do mínimo
 
 # Lista dos animais
 animais = {
@@ -66,9 +68,20 @@ def apostar():
     numero = int(request.form['animal'])
     valor = float(request.form['valor'])
 
+    # Verifica se o valor da aposta é válido
+    if valor < VALOR_MINIMO_APOSTA:
+        return jsonify({
+            'erro': f'O valor mínimo da aposta é R$ {VALOR_MINIMO_APOSTA:.2f}'
+        }), 400
+
     dados_banca['apostado'] += valor
 
-    if random.randint(1, 100) <= dados_banca['chance_vitoria']:
+    # Calcula a chance de vitória baseada no valor da aposta
+    valor_acima_minimo = valor - VALOR_MINIMO_APOSTA
+    reducao_chance = int(valor_acima_minimo / 5) * REDUCAO_CHANCE_POR_5_REAIS
+    chance_atual = max(1, dados_banca['chance_vitoria'] - reducao_chance)
+
+    if random.randint(1, 100) <= chance_atual:
         sorteado = numero
     else:
         opcoes = [n for n in animais.keys() if n != numero]
@@ -79,9 +92,9 @@ def apostar():
     if sorteado == numero:
         ganho = valor * 20
         dados_banca['pago'] += ganho
-        resultado = f"🎉 Você ganhou R${ganho:.2f}!"
+        resultado = f"🎉 Você ganhou R${ganho:.2f}! (Chance: {chance_atual}%)"
     else:
-        resultado = "😞 Você perdeu."
+        resultado = f"😞 Você perdeu. (Chance: {chance_atual}%)"
 
     dados_banca['lucro'] = dados_banca['apostado'] - dados_banca['pago']
 
@@ -96,7 +109,8 @@ def apostar():
         'apostado': dados_banca['apostado'],
         'pago': dados_banca['pago'],
         'lucro': dados_banca['lucro'],
-        'ranking': dados_banca['ranking']
+        'ranking': dados_banca['ranking'],
+        'chance_atual': chance_atual
     })
 
 @app.route('/configurar', methods=['POST'])
