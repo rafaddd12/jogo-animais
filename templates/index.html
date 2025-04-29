@@ -15,7 +15,10 @@
   <div class="animais-grid">
     {% for numero, nome in animais.items() %}
     <button class="animal-btn" onclick="selecionarAnimal({{ numero }}, '{{ nome }}', this)">
-      <img src="{{ url_for('static', filename='icons/' + numero|string + '.jpg') }}" alt="{{ nome }}" class="animal-img">
+      <img src="{{ url_for('static', filename='icons/' + numero|string + '.jpg') }}" 
+           onerror="this.onerror=null; this.src='{{ url_for('static', filename='icons/' + numero|string + '.png') }}'"
+           alt="{{ nome }}" 
+           class="animal-img">
       <div class="animal-numero">{{ numero }}</div>
       <div class="animal-nome">{{ nome }}</div>
     </button>
