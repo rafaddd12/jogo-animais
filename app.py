@@ -10,7 +10,7 @@ app.secret_key = os.urandom(24)  # Chave para sessão
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"  # Mude para uma senha mais segura!
 VALOR_MINIMO_APOSTA = 5.0  # Valor mínimo da aposta
-REDUCAO_CHANCE_POR_5_REAIS = 1  # Redução de chance a cada R$ 5,00 acima do mínimo
+REDUCAO_CHANCE_POR_5_REAIS = 2  # Redução de chance a cada R$ 5,00 acima do mínimo (aumentado para 2%)
 
 # Lista dos animais
 animais = {
@@ -80,6 +80,10 @@ def apostar():
     valor_acima_minimo = valor - VALOR_MINIMO_APOSTA
     reducao_chance = int(valor_acima_minimo / 5) * REDUCAO_CHANCE_POR_5_REAIS
     chance_atual = max(1, dados_banca['chance_vitoria'] - reducao_chance)
+
+    # Redução adicional baseada no valor da aposta
+    reducao_adicional = int(valor / 20)  # Reduz 1% a cada R$ 20,00 apostados
+    chance_atual = max(1, chance_atual - reducao_adicional)
 
     if random.randint(1, 100) <= chance_atual:
         sorteado = numero
