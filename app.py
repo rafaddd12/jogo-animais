@@ -96,9 +96,9 @@ def apostar():
     if sorteado == numero:
         ganho = valor * 20
         dados_banca['pago'] += ganho
-        resultado = f"🎉 Você ganhou R${ganho:.2f}! (Chance: {chance_atual}%)"
+        resultado = f"🎉 Você ganhou R${ganho:.2f}!"
     else:
-        resultado = f"😞 Você perdeu. (Chance: {chance_atual}%)"
+        resultado = "😞 Você perdeu."
 
     dados_banca['lucro'] = dados_banca['apostado'] - dados_banca['pago']
 
