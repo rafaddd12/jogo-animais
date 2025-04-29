@@ -1,8 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import random
 import os
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Chave para sessão
+
+# Configurações do admin
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin123"  # Mude para uma senha mais segura!
 
 # Lista dos animais
 animais = {
@@ -22,9 +28,38 @@ dados_banca = {
     'ranking': []
 }
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/')
 def home():
     return render_template('index.html', animais=animais)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('admin'))
+        return 'Login inválido'
+    return render_template('login.html')
+
+@app.route('/admin')
+@login_required
+def admin():
+    return render_template('admin.html', dados_banca=dados_banca)
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('home'))
 
 @app.route('/apostar', methods=['POST'])
 def apostar():
@@ -65,12 +100,14 @@ def apostar():
     })
 
 @app.route('/configurar', methods=['POST'])
+@login_required
 def configurar():
     nova_chance = int(request.form['chance'])
     dados_banca['chance_vitoria'] = nova_chance
     return jsonify({'status': 'Chance atualizada'})
 
 @app.route('/zerar', methods=['POST'])
+@login_required
 def zerar():
     dados_banca['apostado'] = 0
     dados_banca['pago'] = 0
