@@ -38,32 +38,25 @@ function confirmarAposta() {
 
 // Realizar sorteio
 async function realizarSorteio() {
-    const nomes = [
-        'Avestruz', 'Águia', 'Burro', 'Borboleta', 'Cachorro',
-        'Cabra', 'Carneiro', 'Camelo', 'Cobra', 'Coelho',
-        'Cavalo', 'Elefante', 'Galo', 'Gato', 'Jacaré',
-        'Leão', 'Macaco', 'Porco', 'Pavão', 'Peru',
-        'Touro', 'Tigre', 'Urso', 'Veado', 'Vaca'
-    ];
-
-    // Determinar se o jogador ganhou
-    let ganhou = Math.random() * 100 < chanceVitoria;
-    let numeroSorteado;
-
-    if (ganhou) {
-        // Se ganhou, sorteia o animal apostado
-        numeroSorteado = animalSelecionado;
-    } else {
-        // Se perdeu, sorteia um animal diferente do apostado
-        let opcoes = Array.from({length: 25}, (_, i) => i + 1).filter(num => num !== animalSelecionado);
-        numeroSorteado = opcoes[Math.floor(Math.random() * opcoes.length)];
-    }
-
     // Animação de seleção
-    await animarSelecao(numeroSorteado);
+    await animarSelecao(animalSelecionado);
 
-    // Mostrar resultado
-    mostrarResultado(numeroSorteado, nomes[numeroSorteado - 1], ganhou);
+    // Fazer a aposta
+    fetch('/apostar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `animal=${animalSelecionado}&valor=${valorAposta}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Mostrar resultado
+        document.getElementById('mensagem-resultado').innerText = data.resultado;
+        document.getElementById('imagem-resultado').src = `/static/icons/${data.numero}.jpg`;
+        document.getElementById('nome-resultado').innerText = `${data.numero} - ${data.animal}`;
+        document.getElementById('area-resultado').style.display = 'block';
+    });
 }
 
 // Animação de seleção
@@ -91,7 +84,7 @@ async function animarSelecao(numeroSorteado) {
     // Criar array com índices dos botões
     let indices = Array.from({length: totalBotoes}, (_, i) => i);
     
-    // Animar todos os botões em sequência aleatória (2 voltas ao invés de 3)
+    // Animar todos os botões em sequência aleatória (2 voltas)
     for (let i = 0; i < 2; i++) {
         indices = embaralharArray([...indices]);
         for (let j = 0; j < totalBotoes; j++) {
@@ -99,12 +92,12 @@ async function animarSelecao(numeroSorteado) {
                 setTimeout(() => {
                     animarBotao(botoes[indices[j]]);
                     resolve();
-                }, 50); // Reduzido de 100ms para 50ms
+                }, 50);
             });
         }
     }
 
-    // Animar até o número sorteado (5 animais ao invés de 10)
+    // Animar até o número sorteado (5 animais)
     const indiceSorteado = numeroSorteado - 1;
     indices = embaralharArray([...indices]);
     let contador = 0;
@@ -116,7 +109,7 @@ async function animarSelecao(numeroSorteado) {
                 setTimeout(() => {
                     animarBotao(botoes[indiceAtual]);
                     resolve();
-                }, 50); // Reduzido de 100ms para 50ms
+                }, 50);
             });
         }
         contador++;
@@ -127,35 +120,7 @@ async function animarSelecao(numeroSorteado) {
     botaoSorteado.classList.add('animacao');
     setTimeout(() => {
         botaoSorteado.classList.remove('animacao');
-    }, 300); // Reduzido de 500ms para 300ms
-}
-
-// Mostrar resultado
-function mostrarResultado(numeroSorteado, nomeSorteado, ganhou) {
-    let mensagem = "";
-    let resultadoTexto = "";
-
-    if (ganhou) {
-        let ganho = valorAposta * 20;
-        mensagem = `🏆 VOCÊ GANHOU R$ ${ganho.toFixed(2)} 🏆`;
-        lucroTotal -= (ganho - valorAposta);
-        resultadoTexto = `GANHOU: ${numeroSorteado} - ${nomeSorteado} (+R$ ${(ganho-valorAposta).toFixed(2)})`;
-    } else {
-        mensagem = `❌ Você perdeu!`;
-        lucroTotal += valorAposta;
-        resultadoTexto = `PERDEU: ${numeroSorteado} - ${nomeSorteado} (-R$ ${valorAposta.toFixed(2)})`;
-    }
-
-    // Atualizar tela de resultado
-    document.getElementById('mensagem-resultado').innerText = mensagem;
-    document.getElementById('imagem-resultado').src = `/static/icons/${numeroSorteado}.jpg`;
-    document.getElementById('nome-resultado').innerText = `${numeroSorteado} - ${nomeSorteado}`;
-    document.getElementById('area-resultado').style.display = 'block';
-
-    // Atualizar histórico
-    historicoResultados.unshift(resultadoTexto);
-    atualizarListaResultados();
-    atualizarBanca();
+    }, 300);
 }
 
 // Limpar resultado

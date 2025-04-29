@@ -1,8 +1,8 @@
 body {
   font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
   margin: 0;
   padding: 0;
-  background-color: #f0f0f0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,6 +22,17 @@ h1 {
   color: #333;
   margin-bottom: 20px;
   font-size: 1.5em;
+}
+
+#animal-selecionado {
+  font-size: 1.2em;
+  margin: 20px 0;
+  color: #4CAF50;
+  font-weight: bold;
+  padding: 10px;
+  background: #e8f5e9;
+  border-radius: 5px;
+  display: inline-block;
 }
 
 .animais-grid {
@@ -108,7 +119,7 @@ h1 {
 
 .area-aposta {
   position: fixed;
-  bottom: 60px;
+  bottom: 20px;
   left: 0;
   right: 0;
   background: white;
@@ -148,17 +159,41 @@ h1 {
 }
 
 .resultado-container {
-  margin: 15px auto;
-  padding: 15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  max-width: 500px;
-  margin-bottom: 100px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  text-align: center;
+  animation: aparecer 0.5s ease-out;
+  max-width: 90%;
 }
 
-.animal-sorteado {
-  margin: 20px 0;
+@keyframes aparecer {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.mensagem-ganhou {
+  animation: piscar 1s infinite;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+@keyframes piscar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .resultado-img {
@@ -166,113 +201,37 @@ h1 {
   height: 150px;
   object-fit: contain;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin: 10px 0;
   border: 3px solid #4CAF50;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   background-color: #f8f8f8;
 }
 
-.lista-resultados {
-  max-width: 600px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin-bottom: 80px;
-}
-
-#lista-resultados {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#lista-resultados li {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-#lista-resultados li:hover {
-  background-color: #f5f5f5;
-}
-
-#lista-resultados li:last-child {
-  border-bottom: none;
-}
-
-.abas {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: white;
-  padding: 8px;
-  display: flex;
-  justify-content: space-around;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-  z-index: 100;
-}
-
-.abas button {
-  background: none;
-  border: none;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #666;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-
-.abas button:hover {
-  color: #4CAF50;
-  transform: translateY(-2px);
-}
-
-#chance-vitoria {
-  width: 100%;
-  max-width: 300px;
-  margin: 20px 0;
-}
-
-.selecionado-texto {
-  font-size: 1.2em;
-  margin: 20px 0;
-  color: #4CAF50;
-  font-weight: bold;
-  padding: 10px;
-  background: #e8f5e9;
-  border-radius: 5px;
-  display: inline-block;
-}
-
 /* Media Queries para diferentes tamanhos de tela */
 @media (max-width: 600px) {
   .animais-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    padding-bottom: 100px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    padding-bottom: 80px;
   }
 
   .animal-btn {
-    height: 120px;
+    height: 100px;
     padding: 4px;
   }
 
   .animal-img {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
   }
 
   .animal-numero {
-    font-size: 0.8em;
+    font-size: 0.7em;
+    margin: 1px 0;
   }
 
   .animal-nome {
-    font-size: 0.7em;
+    font-size: 0.6em;
   }
 
   .input-aposta {
@@ -289,57 +248,24 @@ h1 {
     width: 120px;
     height: 120px;
   }
-
-  .abas button {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
 }
 
-@media (min-width: 601px) and (max-width: 900px) {
+@media (max-width: 400px) {
   .animais-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* Ajuste para telas muito pequenas */
-@media (max-width: 360px) {
-  .animais-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .area-aposta {
-    flex-direction: column;
-    padding: 8px;
-  }
-
-  .input-aposta {
-    width: 90%;
-    margin-bottom: 5px;
-  }
-
-  .botao-apostar {
-    width: 90%;
-  }
-}
-
-/* Ajuste para landscape em celulares */
-@media (max-height: 500px) and (orientation: landscape) {
-  .animais-grid {
-    grid-template-columns: repeat(8, 1fr);
-    padding-bottom: 60px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
   }
 
   .animal-btn {
-    height: 100px;
+    height: 90px;
   }
 
   .animal-img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
   }
 
   .area-aposta {
-    bottom: 40px;
+    padding: 8px;
   }
 }
