@@ -259,35 +259,40 @@ def apostar():
 
         dados_banca['apostado'] += valor
 
-        # Calcula a chance de vitória baseada no valor da aposta
-        chance_atual = float(dados_banca['chance_vitoria'])  # Começa com a chance base
-        print(f"Chance base definida no admin: {chance_atual}%")
-        
-        # Calcula a chance proporcional à chance base do admin
-        chance_proporcional = (chance_atual / 100) * 20  # 20% é o máximo para aposta mínima
-        
-        # Aplica redução base para valor mínimo (R$ 5,00)
-        if valor == VALOR_MINIMO_APOSTA:
-            chance_atual = chance_proporcional
-            print(f"Chance proporcional para aposta mínima (R$ 5,00): {chance_atual}%")
-        
-        # Redução para valores acima do mínimo
-        elif valor > VALOR_MINIMO_APOSTA:
-            valor_acima_minimo = valor - VALOR_MINIMO_APOSTA
+        # Se a chance base for 0, a chance final também será 0
+        if dados_banca['chance_vitoria'] == 0:
+            chance_atual = 0
+            print("Chance base é 0%, chance final também será 0%")
+        else:
+            # Calcula a chance de vitória baseada no valor da aposta
+            chance_atual = float(dados_banca['chance_vitoria'])  # Começa com a chance base
+            print(f"Chance base definida no admin: {chance_atual}%")
             
-            # Começa com a chance proporcional
-            chance_atual = chance_proporcional
+            # Calcula a chance proporcional à chance base do admin
+            chance_proporcional = (chance_atual / 100) * 20  # 20% é o máximo para aposta mínima
             
-            # Redução progressiva (quanto mais alto o valor, maior a redução)
-            reducao_progressiva = (valor_acima_minimo / VALOR_MINIMO_APOSTA) * (chance_atual * 0.5)
+            # Aplica redução base para valor mínimo (R$ 5,00)
+            if valor == VALOR_MINIMO_APOSTA:
+                chance_atual = chance_proporcional
+                print(f"Chance proporcional para aposta mínima (R$ 5,00): {chance_atual}%")
             
-            # Aplica a redução progressiva
-            chance_atual = max(1, chance_atual - reducao_progressiva)
-            print(f"Chance após redução progressiva: {chance_atual}%")
+            # Redução para valores acima do mínimo
+            elif valor > VALOR_MINIMO_APOSTA:
+                valor_acima_minimo = valor - VALOR_MINIMO_APOSTA
+                
+                # Começa com a chance proporcional
+                chance_atual = chance_proporcional
+                
+                # Redução progressiva (quanto mais alto o valor, maior a redução)
+                reducao_progressiva = (valor_acima_minimo / VALOR_MINIMO_APOSTA) * (chance_atual * 0.5)
+                
+                # Aplica a redução progressiva
+                chance_atual = max(1, chance_atual - reducao_progressiva)
+                print(f"Chance após redução progressiva: {chance_atual}%")
 
-        # Garante que a chance está entre 1% e o máximo definido no admin
-        chance_atual = max(1, min(chance_atual, dados_banca['chance_vitoria']))
-        print(f"Chance final após ajustes: {chance_atual}%")
+            # Garante que a chance está entre 1% e o máximo definido no admin
+            chance_atual = max(1, min(chance_atual, dados_banca['chance_vitoria']))
+            print(f"Chance final após ajustes: {chance_atual}%")
 
         # Sorteia o resultado baseado na chance calculada
         if random.uniform(0, 100) <= chance_atual:
