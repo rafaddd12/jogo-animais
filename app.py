@@ -5,6 +5,7 @@ from functools import wraps
 import hashlib
 import time
 from datetime import datetime, timedelta
+from printer import ThermalPrinter
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Chave para sessão
@@ -27,6 +28,10 @@ CSRF_TOKEN_TIMEOUT_MINUTES = 60
 LIMITE_APOSTA_MAXIMO = 1000.0  # Limite máximo de aposta
 MAX_APOSTAS_POR_MINUTO = 10    # Limite de apostas por minuto
 TEMPO_SESSAO_ADMIN = 7200      # Tempo de sessão do admin em segundos (2 horas)
+
+# Configuração da impressora
+PRINTER_ADDRESS = "00:11:22:33:44:55"  # Substitua pelo endereço Bluetooth da sua impressora
+printer = ThermalPrinter()
 
 # Lista dos animais
 animais = {
@@ -52,6 +57,9 @@ admin_logs = []
 
 # Controle de apostas
 controle_apostas = {}
+
+# Inicializa a impressora
+printer.connect(PRINTER_ADDRESS)
 
 def generate_csrf_token():
     """Gera um token CSRF único"""
@@ -263,7 +271,7 @@ def apostar():
         if dados_banca['chance_vitoria'] == 0:
             chance_atual = 0
             print("Chance base é 0%, chance final também será 0%")
-        # Se o valor for maior que R$ 20,00, a chance será 0
+        # Se o valor for maior que R$ 10,00, a chance será 0
         elif valor > 10.0:
             chance_atual = 0
             print("Valor acima de R$ 10,00, chance final será 0%")
@@ -312,9 +320,13 @@ def apostar():
             dados_banca['pago'] += ganho
             resultado = f"🎉 Você ganhou R${ganho:.2f}!"
             log_admin_action(f'Aposta de R${valor:.2f} - Ganhou R${ganho:.2f}', ip, valor, chance_atual)
+            # Tenta imprimir o resultado
+            printer.print_result(valor, f"Ganhou R${ganho:.2f}", chance_atual)
         else:
             resultado = "😞 Você perdeu."
             log_admin_action(f'Aposta de R${valor:.2f} - Perdeu', ip, valor, chance_atual)
+            # Tenta imprimir o resultado
+            printer.print_result(valor, "Perdeu", chance_atual)
 
         dados_banca['lucro'] = dados_banca['apostado'] - dados_banca['pago']
 
