@@ -3,45 +3,280 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogo de Animais</title>
+  <title>Jogo de Animais - Ganhe 20x o Valor da Aposta!</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .propaganda {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      animation: pulse 2s infinite;
+    }
+    .propaganda h2 {
+      margin: 0;
+      font-size: 28px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .propaganda p {
+      margin: 10px 0 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .resultado-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-height: 250px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+      margin: 0;
+      max-width: 400px;
+      width: 90%;
+      padding: 30px 20px;
+      z-index: 1000;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .mensagem-ganhou {
+      font-size: 28px;
+      font-weight: bold;
+      color: #27ae60;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    }
+    .mensagem-perdeu {
+      font-size: 28px;
+      font-weight: bold;
+      color: #e74c3c;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    }
+    .animal-sorteado {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 25px;
+      transform: scale(1.2);
+    }
+    .resultado-img {
+      width: 150px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #f8f8f8;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #nome-resultado {
+      font-size: 22px;
+      color: #333;
+      font-weight: bold;
+      text-align: center;
+    }
+    .animais-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 20px 0;
+    }
+    .animal-btn {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .animal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .animal-btn.selecionado {
+      border-color: #4CAF50;
+      background: #e8f5e9;
+    }
+    .animal-img {
+      width: 100%;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 3px;
+    }
+    .animal-numero {
+      font-weight: bold;
+      font-size: 12px;
+      margin: 2px 0;
+    }
+    .animal-nome {
+      color: #666;
+      font-size: 10px;
+    }
+    .area-aposta {
+      margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+    .input-aposta {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 250px;
+    }
+    .botao-apostar {
+      padding: 12px 24px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .botao-apostar:hover {
+      background: #388E3C;
+      transform: translateY(-2px);
+    }
+    .ranking-container {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .ranking-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ranking-item {
+      padding: 8px 12px;
+      background: white;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+    .botao-jogar-novamente {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .botao-jogar-novamente:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+      background: #388E3C;
+    }
+  </style>
 </head>
 <body>
-
 <div class="tela" id="tela-apostar">
-  <h1>Jogo de Animais</h1>
-  <div id="animal-selecionado">Nenhum animal selecionado</div>
+  <div id="area-aposta">
+    <div class="propaganda">
+      <h2>🎉 GANHE 20X O VALOR DA APOSTA! 🎉</h2>
+      <p>Aposte R$ 5,00 e ganhe R$ 100,00!</p>
+    </div>
 
-  <div class="animais-grid">
-    {% for numero, nome in animais.items() %}
-    <button class="animal-btn" onclick="selecionarAnimal({{ numero }}, '{{ nome }}', this)">
-      <img src="{{ url_for('static', filename='icons/' + numero|string + '.jpg') }}" 
-           onerror="this.onerror=null; this.src='{{ url_for('static', filename='icons/' + numero|string + '.png') }}'"
-           alt="{{ nome }}" 
-           class="animal-img">
-      <div class="animal-numero">{{ numero }}</div>
-      <div class="animal-nome">{{ nome }}</div>
-    </button>
-    {% endfor %}
+    <h1>Jogo do bicho online</h1>
+    <div id="animal-selecionado">Nenhum animal selecionado</div>
+
+    <div class="area-aposta">
+      <input type="number" id="valor" class="input-aposta" placeholder="Valor da aposta (mínimo R$ 5,00)" min="5" step="0.01">
+      <button onclick="confirmarAposta()" class="botao-apostar">🎲 Apostar</button>
+    </div>
+
+    <div class="animais-grid">
+      {% for numero, nome in animais.items() %}
+      <button class="animal-btn" data-numero="{{ numero }}" data-nome="{{ nome }}" onclick="selecionarAnimal({{ numero }}, '{{ nome }}', this)">
+        <img src="{{ url_for('static', filename='icons/' + numero|string + '.jpg') }}" 
+             onerror="this.onerror=null; this.src='{{ url_for('static', filename='icons/' + numero|string + '.png') }}'"
+             alt="{{ nome }}" 
+             class="animal-img">
+        <div class="animal-numero">{{ numero }}</div>
+        <div class="animal-nome">{{ nome }}</div>
+      </button>
+      {% endfor %}
+    </div>
+
+    <div class="ranking-container">
+      <div class="ranking-title">Últimos Resultados</div>
+      <div class="ranking-list" id="ranking-list">
+        <!-- O ranking será preenchido via JavaScript -->
+      </div>
+    </div>
   </div>
 
-  <div class="area-aposta">
-    <input type="number" id="valor" class="input-aposta" placeholder="Valor da aposta (mínimo R$ 5,00)" min="5" step="0.01">
-    <button onclick="confirmarAposta()" class="botao-apostar">🎲 Apostar</button>
-  </div>
-
-  <div id="area-resultado" class="resultado-container" style="display: none;">
+  <div id="overlay" class="overlay"></div>
+  <div id="area-resultado" class="resultado-container">
     <div id="mensagem-resultado" class="mensagem-ganhou"></div>
     <div class="animal-sorteado">
       <img id="imagem-resultado" src="" alt="Animal Sorteado" class="resultado-img">
       <div id="nome-resultado"></div>
     </div>
-    <button onclick="limparResultado()" class="botao-apostar">Jogar Novamente</button>
+    <button onclick="limparResultado()" class="botao-jogar-novamente">Jogar Novamente</button>
   </div>
 </div>
 
+<script>
+  function createConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    const confettiCount = 50;
+    const container = document.getElementById('area-resultado');
+    
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 2 + 's';
+      container.appendChild(confetti);
+      
+      setTimeout(() => {
+        confetti.remove();
+      }, 3000);
+    }
+  }
+</script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
 </body>
 </html>
 

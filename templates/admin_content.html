@@ -1,0 +1,32 @@
+<!-- Conteúdo parcial para atualização AJAX -->
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-title">Total Apostado</div>
+        <div class="stat-value">R$ {{ "%.2f"|format(dados_banca.apostado) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Total Pago</div>
+        <div class="stat-value">R$ {{ "%.2f"|format(dados_banca.pago) }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Lucro</div>
+        <div class="stat-value" style="color: {{ 'green' if dados_banca.lucro >= 0 else 'red' }}">
+            R$ {{ "%.2f"|format(dados_banca.lucro) }}
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Chance de Vitória</div>
+        <div class="stat-value">{{ dados_banca.chance_vitoria }}%</div>
+    </div>
+</div>
+
+<div class="logs">
+    <h2>Últimas Atividades</h2>
+    {% for log in admin_logs|reverse %}
+    <div class="log-entry">
+        <span class="log-time">{{ log.timestamp }}</span>
+        <span class="log-ip">[{{ log.ip }}]</span>
+        {{ log.action }}
+    </div>
+    {% endfor %}
+</div> 

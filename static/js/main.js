@@ -15,63 +15,18 @@ function mostrarTela(nomeTela) {
 
 // Selecionar animal
 function selecionarAnimal(numero, nome, elemento) {
-    animalSelecionado = numero;
-    nomeAnimalSelecionado = nome;
-    document.getElementById('animal-selecionado').innerText = `Animal Selecionado: ${numero} - ${nome}`;
-
+    // Remove seleção anterior
     document.querySelectorAll('.animal-btn').forEach(btn => btn.classList.remove('selecionado'));
+    
+    // Adiciona seleção atual
     elemento.classList.add('selecionado');
-}
-
-// Confirmar aposta
-function confirmarAposta() {
-    valorAposta = parseFloat(document.getElementById('valor').value);
-
-    if (!animalSelecionado) {
-        alert('Escolha um animal para apostar!');
-        return;
-    }
-
-    if (isNaN(valorAposta) || valorAposta < 5) {
-        alert('O valor mínimo da aposta é R$ 5,00!');
-        return;
-    }
-
-    // Realizar o sorteio
-    realizarSorteio();
-}
-
-// Realizar sorteio
-async function realizarSorteio() {
-    // Animação de seleção
-    await animarSelecao(animalSelecionado);
-
-    // Fazer a aposta
-    fetch('/apostar', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `animal=${animalSelecionado}&valor=${valorAposta}`
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.erro || 'Erro ao realizar a aposta');
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Mostrar resultado
-        document.getElementById('mensagem-resultado').innerText = data.resultado;
-        document.getElementById('imagem-resultado').src = `/static/icons/${data.numero}.jpg`;
-        document.getElementById('nome-resultado').innerText = `${data.numero} - ${data.animal}`;
-        document.getElementById('area-resultado').style.display = 'block';
-    })
-    .catch(error => {
-        alert(error.message);
-    });
+    
+    // Atualiza o texto do animal selecionado
+    document.getElementById('animal-selecionado').textContent = `Animal Selecionado: ${numero} - ${nome}`;
+    
+    // Armazena o número e nome do animal selecionado no botão
+    elemento.setAttribute('data-numero', numero);
+    elemento.setAttribute('data-nome', nome);
 }
 
 // Animação de seleção
@@ -138,14 +93,103 @@ async function animarSelecao(numeroSorteado) {
     }, 300);
 }
 
-// Limpar resultado
+// Confirmar aposta
+function confirmarAposta() {
+    const valor = parseFloat(document.getElementById('valor').value);
+    const animalSelecionado = document.querySelector('.animal-btn.selecionado');
+
+    if (!animalSelecionado) {
+        alert('Por favor, selecione um animal');
+        return;
+    }
+
+    if (isNaN(valor) || valor < 5) {
+        alert('O valor mínimo da aposta é R$ 5,00');
+        return;
+    }
+
+    const numero = animalSelecionado.getAttribute('data-numero');
+
+    // Desabilita o botão de apostar durante o processo
+    const botaoApostar = document.querySelector('.botao-apostar');
+    botaoApostar.disabled = true;
+
+    // Realiza a animação do sorteio
+    animarSelecao(numero)
+        .then(() => {
+            // Após a animação, faz a aposta
+            return fetch('/apostar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `animal=${numero}&valor=${valor}`
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.erro) {
+                throw new Error(data.erro);
+            }
+
+            // Atualiza o ranking
+            if (data.ranking) {
+                atualizarRanking(data.ranking);
+            }
+
+            // Mostra o resultado
+            const areaResultado = document.getElementById('area-resultado');
+            const mensagemResultado = document.getElementById('mensagem-resultado');
+            const imagemResultado = document.getElementById('imagem-resultado');
+            const nomeResultado = document.getElementById('nome-resultado');
+            const overlay = document.getElementById('overlay');
+
+            if (!areaResultado || !mensagemResultado || !imagemResultado || !nomeResultado || !overlay) {
+                throw new Error('Elementos do resultado não encontrados');
+            }
+
+            mensagemResultado.textContent = data.resultado;
+            mensagemResultado.className = data.resultado.includes('ganhou') ? 'mensagem-ganhou' : 'mensagem-perdeu';
+            imagemResultado.src = `/static/icons/${data.numero}.jpg`;
+            nomeResultado.textContent = `${data.numero} - ${data.animal}`;
+
+            // Esconde a área de aposta e mostra o resultado
+            document.getElementById('area-aposta').style.display = 'none';
+            overlay.style.display = 'block';
+            areaResultado.style.display = 'flex';
+
+            // Se ganhou, dispara os confetes
+            if (data.resultado.includes('ganhou')) {
+                createConfetti();
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert(error.message || 'Ocorreu um erro ao processar sua aposta');
+        })
+        .finally(() => {
+            // Reabilita o botão de apostar
+            botaoApostar.disabled = false;
+        });
+}
+
+// Limpar resultado e voltar para aposta
 function limparResultado() {
-    document.getElementById('area-resultado').style.display = 'none';
-    document.getElementById('animal-selecionado').innerText = "Nenhum animal selecionado";
-    document.getElementById('valor').value = "";
+    const areaResultado = document.getElementById('area-resultado');
+    const overlay = document.getElementById('overlay');
+    const areaAposta = document.getElementById('area-aposta');
+    const animalSelecionado = document.getElementById('animal-selecionado');
+    const valorInput = document.getElementById('valor');
+
+    // Limpa a seleção do animal
     document.querySelectorAll('.animal-btn').forEach(btn => btn.classList.remove('selecionado'));
-    animalSelecionado = null;
-    nomeAnimalSelecionado = null;
+    animalSelecionado.textContent = 'Nenhum animal selecionado';
+    valorInput.value = '';
+
+    // Esconde o resultado e mostra a área de aposta
+    overlay.style.display = 'none';
+    areaResultado.style.display = 'none';
+    areaAposta.style.display = 'block';
 }
 
 // Atualizar lucro da banca e visão de status
@@ -192,4 +236,18 @@ function zerarBanca() {
     lucroTotal = 0;
     atualizarBanca();
     alert('Banca Zerada!');
+}
+
+// Atualizar ranking
+function atualizarRanking(ranking) {
+    const rankingList = document.getElementById('ranking-list');
+    if (!rankingList) return;
+
+    rankingList.innerHTML = '';
+    ranking.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'ranking-item';
+        div.textContent = item;
+        rankingList.appendChild(div);
+    });
 }

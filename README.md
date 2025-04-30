@@ -1,20 +1,26 @@
-# Jogo de Animais
+# Sistema de Apostas
 
-Um jogo de apostas simples onde você pode apostar em diferentes animais.
+Um sistema de apostas desenvolvido em Flask com painel administrativo.
 
-## Tecnologias Utilizadas
-- Python
-- Flask
-- HTML/CSS/JavaScript
+## Configuração
 
-## Como Jogar
-1. Selecione um animal
-2. Digite o valor da aposta
-3. Clique em "Apostar"
-4. Assista a animação do sorteio
-5. Veja se você ganhou!
+1. Clone o repositório
+2. Instale as dependências:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Execute o aplicativo:
+   ```bash
+   python app.py
+   ```
 
-## Configurações
-- Chance de vitória ajustável
-- Histórico de resultados
-- Controle de banca 
+## Acesso
+
+- URL principal: http://localhost:5000
+- Painel administrativo: http://localhost:5000/login
+  - Usuário: admin
+  - Senha: brasil2018
+
+## Deploy
+
+O projeto está configurado para deploy no Render. Basta fazer push para o repositório conectado ao Render. 

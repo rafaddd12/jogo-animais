@@ -1,0 +1,118 @@
+:root[data-theme="light"] {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent-color: #4CAF50;
+    --accent-hover: #388E3C;
+    --danger-color: #f44336;
+    --danger-hover: #d32f2f;
+    --border-color: #dddddd;
+    --shadow-color: rgba(0,0,0,0.1);
+    --success-color: #4CAF50;
+    --error-color: #f44336;
+    --warning-color: #ff9800;
+}
+
+:root[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent-color: #66bb6a;
+    --accent-hover: #4caf50;
+    --danger-color: #ef5350;
+    --danger-hover: #e53935;
+    --border-color: #404040;
+    --shadow-color: rgba(0,0,0,0.3);
+    --success-color: #66bb6a;
+    --error-color: #ef5350;
+    --warning-color: #ffa726;
+}
+
+/* Transições suaves */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos base que usam as variáveis */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.container {
+    background-color: var(--bg-secondary);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.stat-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.stat-title {
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    color: var(--text-primary);
+}
+
+button {
+    background-color: var(--accent-color);
+}
+
+button:hover {
+    background-color: var(--accent-hover);
+}
+
+button.danger {
+    background-color: var(--danger-color);
+}
+
+button.danger:hover {
+    background-color: var(--danger-hover);
+}
+
+input {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-color), 0.2);
+}
+
+.log-entry {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.log-time {
+    color: var(--text-secondary);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: rotate(180deg);
+} 
