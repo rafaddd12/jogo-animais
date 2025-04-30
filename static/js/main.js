@@ -251,3 +251,30 @@ function atualizarRanking(ranking) {
         rankingList.appendChild(div);
     });
 }
+
+// Função para imprimir o resultado
+function imprimirResultado() {
+    const mensagem = document.getElementById('mensagem-resultado').textContent;
+    const animalSorteado = document.getElementById('nome-resultado').textContent;
+    const valorAposta = document.getElementById('valor').value;
+    
+    fetch('/imprimir', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `resultado=${encodeURIComponent(mensagem)}&animal=${encodeURIComponent(animalSorteado)}&valor=${valorAposta}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.erro) {
+            alert('Erro ao imprimir: ' + data.erro);
+        } else {
+            alert('Imprimindo resultado...');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao tentar imprimir');
+    });
+}

@@ -206,6 +206,23 @@
       box-shadow: 0 6px 8px rgba(0,0,0,0.15);
       background: #388E3C;
     }
+    .botao-imprimir {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+    .botao-imprimir:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+      background: #1976D2;
+    }
   </style>
 </head>
 <body>
@@ -249,9 +266,10 @@
   <div id="area-resultado" class="resultado-container">
     <div id="mensagem-resultado" class="mensagem-ganhou"></div>
     <div class="animal-sorteado">
-      <img id="imagem-resultado" src="" alt="Animal Sorteado" class="resultado-img">
+      <img id="imagem-resultado" class="resultado-img" src="" alt="Animal sorteado">
       <div id="nome-resultado"></div>
     </div>
+    <button onclick="imprimirResultado()" class="botao-imprimir">🖨️ Imprimir Resultado</button>
     <button onclick="limparResultado()" class="botao-jogar-novamente">Jogar Novamente</button>
   </div>
 </div>

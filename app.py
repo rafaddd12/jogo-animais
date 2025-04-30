@@ -404,6 +404,24 @@ def estatisticas():
     
     return jsonify(stats)
 
+@app.route('/imprimir', methods=['POST'])
+def imprimir():
+    try:
+        resultado = request.form.get('resultado')
+        animal = request.form.get('animal')
+        valor = float(request.form.get('valor'))
+        
+        # Extrai a chance real do resultado (se ganhou)
+        chance_real = dados_banca['chance_vitoria']
+        
+        # Tenta imprimir
+        if printer.print_result(valor, resultado, chance_real):
+            return jsonify({'status': 'Imprimindo resultado...'})
+        else:
+            return jsonify({'erro': 'Não foi possível imprimir. Verifique a impressora.'})
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
