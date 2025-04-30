@@ -148,6 +148,12 @@
             color: #2196F3;
             font-family: monospace;
         }
+        .chance-real {
+            color: #4CAF50;
+            font-size: 12px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
         .header-actions {
             display: flex;
             justify-content: space-between;
@@ -228,6 +234,9 @@
                 <span class="log-time">{{ log.timestamp }}</span>
                 <span class="log-ip">[{{ log.ip }}]</span>
                 {{ log.action }}
+                {% if log.chance_real is not none %}
+                <span class="chance-real">(Chance real: {{ "%.2f"|format(log.chance_real) }}%)</span>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
@@ -268,6 +277,7 @@
                             <span class="log-time">${log.timestamp}</span>
                             <span class="log-ip">[${log.ip}]</span>
                             ${log.action}
+                            ${log.chance_real !== null ? `<span class="chance-real">(Chance real: ${log.chance_real.toFixed(2)}%)</span>` : ''}
                         </div>
                     `;
                 });

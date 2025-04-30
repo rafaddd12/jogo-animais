@@ -99,14 +99,15 @@ def check_login_attempts(ip):
     
     return True
 
-def log_admin_action(action, ip, valor=None):
+def log_admin_action(action, ip, valor=None, chance_real=None):
     """Registra ações do admin com mais detalhes"""
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     log_entry = {
         'timestamp': timestamp,
         'action': action,
         'ip': ip,
-        'valor': valor
+        'valor': valor,
+        'chance_real': chance_real
     }
     
     admin_logs.append(log_entry)
@@ -301,8 +302,10 @@ def apostar():
             ganho = valor * 20
             dados_banca['pago'] += ganho
             resultado = f"🎉 Você ganhou R${ganho:.2f}!"
+            log_admin_action(f'Aposta de R${valor:.2f} - Ganhou R${ganho:.2f}', ip, valor, chance_atual)
         else:
             resultado = "😞 Você perdeu."
+            log_admin_action(f'Aposta de R${valor:.2f} - Perdeu', ip, valor, chance_atual)
 
         dados_banca['lucro'] = dados_banca['apostado'] - dados_banca['pago']
 
