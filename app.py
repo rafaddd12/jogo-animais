@@ -263,6 +263,10 @@ def apostar():
         if dados_banca['chance_vitoria'] == 0:
             chance_atual = 0
             print("Chance base é 0%, chance final também será 0%")
+        # Se o valor for maior que R$ 20,00, a chance será 0
+        elif valor > 10.0:
+            chance_atual = 0
+            print("Valor acima de R$ 10,00, chance final será 0%")
         else:
             # Calcula a chance de vitória baseada no valor da aposta
             chance_atual = float(dados_banca['chance_vitoria'])  # Começa com a chance base
