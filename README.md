@@ -19,7 +19,7 @@ Um sistema de apostas desenvolvido em Flask com painel administrativo.
 - URL principal: http://localhost:5000
 - Painel administrativo: http://localhost:5000/login
   - Usuário: admin
-  - Senha: brasil2018
+  - Senha: admin123
 
 ## Deploy
 
